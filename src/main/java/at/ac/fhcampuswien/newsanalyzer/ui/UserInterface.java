@@ -2,6 +2,7 @@ package at.ac.fhcampuswien.newsanalyzer.ui;
 
 
 import at.ac.fhcampuswien.newsanalyzer.ctrl.Controller;
+import org.graalvm.compiler.graph.Node;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,14 +20,34 @@ public class UserInterface
 
 	public void getDataFromCtrl2(){
 		// TODO implement me
+		System.out.println("DEF");
+
+		ctrl.process();
 	}
 
 	public void getDataFromCtrl3(){
 		// TODO implement me
+		System.out.println("3");
+
+		ctrl.process();
 	}
 	
 	public void getDataForCustomInput() {
 		// TODO implement me
+		System.out.println("Enter the Topic: ");
+		String r = readLine();
+		System.out.print("Enter languages:\nar,de,en,es,fr,he,it,nl,no,pt,ru,se,ud,zh\n: ");
+		String input = readLine();
+		if (input.equals("")) {
+			input = "en";
+		}
+		try {
+			System.out.println(ctrl.getData());
+		} catch {
+			System.err.println(e.getMessage());
+		}
+
+
 	}
 
 
