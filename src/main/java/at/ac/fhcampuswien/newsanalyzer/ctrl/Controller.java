@@ -77,15 +77,15 @@ public class Controller {
 			for (Article article : articles) {
 				try {
 					URL url = new URL(article.getUrl()); //had to import URL class
-					BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(article.getTitle().substring(0, 10) + "html"));
-					InputStream inputStream = url.openStream();
-					BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-					String line = bufferedReader.readLine();
+					BufferedWriter bw = new BufferedWriter(new FileWriter(article.getTitle().substring(0, 10) + "html"));
+					InputStream is = url.openStream();
+					BufferedReader br = new BufferedReader(new InputStreamReader(is));
+					String line = br.readLine();
 					while (line != null) {
-						bufferedWriter.write(line);
+						bw.write(line);
 					}
-					bufferedReader.close();
-					bufferedWriter.close();
+						br.close();
+						bw.close();
 				} catch (Exception e) {
 					System.err.println("Fail for saving webpages, reason: " + e.getMessage());
 				}
