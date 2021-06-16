@@ -41,11 +41,7 @@ public class UserInterface
 		if (input.equals("")) {
 			input = "en";
 		}
-		try {
-			System.out.println(ctrl.getData());
-		} catch {
-			System.err.println(e.getMessage());
-		}
+
 
 
 	}
