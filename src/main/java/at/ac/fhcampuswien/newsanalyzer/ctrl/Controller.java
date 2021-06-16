@@ -7,92 +7,92 @@ import at.ac.fhcampuswien.newsapi.beans.NewsResponse;
 import at.ac.fhcampuswien.newsapi.enums.Category;
 import at.ac.fhcampuswien.newsapi.enums.Country;
 import at.ac.fhcampuswien.newsapi.enums.Endpoint;
-//import com.sun.org.apache.xalan.internal.xsltc.compiler.Template;
 
 import java.io.*;
+import java.net.URLConnection;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.net.URL;
-import java.util.List;
-import java.util.Objects;
-import java.util.Comparator;
 
 public class Controller {
 
 	public static final String APIKEY = "edd9f780730647ae87fec76ec98b7416";  //TODO add your api key
 
-	private String q = "corona";
-	private List<Article> article;
-	private NewsResponse newsResponse;
-	private final String pageSize = "100";
-
-	public void process(String corona, Category health) {
+	public void process(String strings, Category menu) {
 		System.out.println("Start process");
 
 		//TODO implement Error handling
-		NewsApi newsApi = null;
-		Category category = null;
-
-		if (category != null) {
-			newsApi = new NewsApiBuilder().setApiKey(APIKEY).setQ(q).setEndPoint(Endpoint.TOP_HEADLINES).setSourceCountry(Country.ch).setSourceCategory(category).createNewsApi();
-		} else if (category == null) {
-			newsApi = new NewsApiBuilder().setApiKey(APIKEY).setQ(q).setEndPoint(Endpoint.TOP_HEADLINES).createNewsApi();
-		}
-
-		NewsResponse newsResponse = null;
-
-		try {
-			newsResponse = newsApi.getNews();
-		} catch (Exception exception) {
-			System.err.println("Error: " + exception.getMessage());
-		}
-
-		if (newsResponse != null) {
-			List<Article> articles = newsResponse.getArticles();
-			System.out.println("Number of articles: " + articles.size());
-			if (articles.isEmpty()) {
-				System.out.println("There are no articles can be shown.");
-				return;
+			NewsApi newsApi;
+			if (menu != null) {
+				newsApi = new NewsApiBuilder().setApiKey(APIKEY).setQ(strings).setEndPoint(Endpoint.TOP_HEADLINES).setSourceCountry(Country.at).setSourceCategory(menu).createNewsApi();
+			} else {
+				newsApi = new NewsApiBuilder().setApiKey(APIKEY).setQ(strings).setEndPoint(Endpoint.TOP_HEADLINES).createNewsApi();
 			}
+			NewsResponse news = null;
 
-			//TODO load the news based on the parameters
-			List<Article> sortArticles = articles.stream().sorted(Comparator.comparingInt(article -> article.getTitle().length())).sorted(Comparator.comparing(Article::getTitle)).collect(Collectors.toList());
-
-			String p = articles.stream().collect(Collectors.groupingBy(article -> article.getSource().getName(), Collectors.counting())).entrySet().stream().max(Comparator.comparingInt(t -> t.getValue().intValue())).get().getKey();
-
-			String author = articles.stream().filter(article -> Objects.nonNull(article.getAuthor())).min(Comparator.comparingInt(article -> article.getAuthor().length())).get().getAuthor();
-
-			if (sortArticles != null) {
-				System.out.println("The first article from sorted List: " + sortArticles.get(0));
+			try {
+				news = newsApi.getNews();
+			} catch (Exception e) {
+				System.err.println("Error: " + e.getMessage());
 			}
+			if (news != null) {
+				List<Article> articles = news.getArticles();
+				Map<String, Long> map = new HashMap<>();
+				for (Article article1 : articles) {
+					map.merge(article1.getSource().getName(), 1L, Long::sum);
+				}
+				String server = map.entrySet().stream().max(Comparator.comparingInt(t -> t.getValue().intValue())).get().getKey();
+				String author = articles.stream().filter(article -> Objects.nonNull(article.getAuthor())).min(Comparator.comparingInt(article -> article.getAuthor().length())).get().getAuthor();
 
-			if (p != null) {
-				System.out.println("Maximum Articles that provided by: " + p);
-			}
+				List<Article> sortedArticles = articles.stream().sorted(Comparator.comparingInt(article -> article.getTitle().length())).sorted(Comparator.comparing(Article::getTitle)).collect(Collectors.toList());
 
-			if (author != null) {
-				System.out.println("Shortest name of Author: " + author);
-			}
-			//TODO implement methods for analysis
+				System.out.println("Articles: " + articles.size());
+				if (articles.isEmpty()) {
+					System.out.println("No articles.");
+					return;
+				}
 
-			for (Article article : articles) {
-				try {
-					URL url = new URL(article.getUrl()); //had to import URL class
-					BufferedWriter bw = new BufferedWriter(new FileWriter(article.getTitle().substring(0, 10) + "html"));
-					InputStream is = url.openStream();
-					BufferedReader br = new BufferedReader(new InputStreamReader(is));
-					String line = br.readLine();
-					while (line != null) {
-						bw.write(line);
+				if (server != null)
+					System.out.println("Server: " + server);
+
+				if (author != null)
+					System.out.println("Author: " + author);
+
+				System.out.println("First: " + sortedArticles.get(0));
+
+				for (Article article : articles) {
+					try {
+						URL newURL = new URL(article.getUrl());
+						URLConnection connection = newURL.openConnection();
+						connection.setDoOutput(true);
+
+						BufferedReader in = new BufferedReader(
+								new InputStreamReader(
+										connection.getInputStream()));
+
+						String decodedString;
+						while ((decodedString = in.readLine()) != null) {
+							System.out.println(decodedString);
+						}
+
+						BufferedWriter writer = new BufferedWriter(new FileWriter(article.getTitle().substring(0, 100) + "html"));
+						String newsText = in.readLine();
+						while (newsText != null) {
+							writer.write(newsText);
+						}
+						in.close();
+						writer.close();
+					} catch (Exception e) {
+						System.err.println("Failed: " + Arrays.toString(e.getStackTrace()));
 					}
-						br.close();
-						bw.close();
-				} catch (Exception e) {
-					System.err.println("Fail for saving webpages, reason: " + e.getMessage());
 				}
 			}
-			System.out.println("End process");
-		}
-	}
+				System.out.println("End process");
+			}
+			//TODO load the news based on the parameters
+
+
+			//TODO implement methods for analysis
 
 		public Object getData() {
 
