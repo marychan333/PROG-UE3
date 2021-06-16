@@ -37,7 +37,9 @@ public class Controller {
 		} else if (category == null) {
 			newsApi = new NewsApiBuilder().setApiKey(APIKEY).setQ(q).setEndPoint(Endpoint.TOP_HEADLINES).createNewsApi();
 		}
+
 		NewsResponse newsResponse = null;
+
 		try {
 			newsResponse = newsApi.getNews();
 		} catch (Exception exception) {
@@ -53,18 +55,18 @@ public class Controller {
 			}
 
 			//TODO load the news based on the parameters
-			List<Article> sortedArticles = articles.stream().sorted(Comparator.comparingInt(article -> article.getTitle().length())).sorted(Comparator.comparing(Article::getTitle)).collect(Collectors.toList());
+			List<Article> sortArticles = articles.stream().sorted(Comparator.comparingInt(article -> article.getTitle().length())).sorted(Comparator.comparing(Article::getTitle)).collect(Collectors.toList());
 
-			String provider = articles.stream().collect(Collectors.groupingBy(article -> article.getSource().getName(), Collectors.counting())).entrySet().stream().max(Comparator.comparingInt(t -> t.getValue().intValue())).get().getKey();
+			String p = articles.stream().collect(Collectors.groupingBy(article -> article.getSource().getName(), Collectors.counting())).entrySet().stream().max(Comparator.comparingInt(t -> t.getValue().intValue())).get().getKey();
 
 			String author = articles.stream().filter(article -> Objects.nonNull(article.getAuthor())).min(Comparator.comparingInt(article -> article.getAuthor().length())).get().getAuthor();
 
-			if (sortedArticles != null) {
-				System.out.println("The first article from sorted List: " + sortedArticles.get(0));
+			if (sortArticles != null) {
+				System.out.println("The first article from sorted List: " + sortArticles.get(0));
 			}
 
-			if (provider != null) {
-				System.out.println("Maximum Articles that provided by: " + provider);
+			if (p != null) {
+				System.out.println("Maximum Articles that provided by: " + p);
 			}
 
 			if (author != null) {
@@ -85,7 +87,7 @@ public class Controller {
 					bufferedReader.close();
 					bufferedWriter.close();
 				} catch (Exception e) {
-					System.err.println("Failed to save webpage: " + e.getMessage());
+					System.err.println("Fail for saving webpages, reason: " + e.getMessage());
 				}
 			}
 			System.out.println("End process");
