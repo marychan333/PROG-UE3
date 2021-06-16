@@ -2,7 +2,7 @@ package at.ac.fhcampuswien.newsanalyzer.ui;
 
 
 import at.ac.fhcampuswien.newsanalyzer.ctrl.Controller;
-import org.graalvm.compiler.graph.Node;
+import at.ac.fhcampuswien.newsapi.enums.Category;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,23 +13,17 @@ public class UserInterface
 	private Controller ctrl = new Controller();
 
 	public void getDataFromCtrl1(){
-		System.out.println("ABC");
-
-		ctrl.process();
+		ctrl.process("Corona", Category.health);
 	}
 
 	public void getDataFromCtrl2(){
 		// TODO implement me
-		System.out.println("DEF");
-
-		ctrl.process();
+		ctrl.process("Volleyball", Category.sports);
 	}
 
 	public void getDataFromCtrl3(){
 		// TODO implement me
-		System.out.println("3");
-
-		ctrl.process();
+		ctrl.process("Bitcoin", Category.business);
 	}
 	
 	public void getDataForCustomInput() {
@@ -41,9 +35,7 @@ public class UserInterface
 		if (input.equals("")) {
 			input = "en";
 		}
-
-
-
+		ctrl.process(r, null);
 	}
 
 

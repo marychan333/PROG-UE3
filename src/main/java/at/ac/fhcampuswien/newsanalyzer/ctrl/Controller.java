@@ -25,7 +25,7 @@ public class Controller {
 	private NewsResponse newsResponse;
 	private final String pageSize = "100";
 
-	public void process() {
+	public void process(String corona, Category health) {
 		System.out.println("Start process");
 
 		//TODO implement Error handling
